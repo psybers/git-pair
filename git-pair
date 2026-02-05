@@ -21,6 +21,40 @@ set_active() {
 		print_usage
 		exit 1
 	fi
+
+	# Find git repo root
+	repo_root=$(git rev-parse --show-toplevel 2>/dev/null)
+	if [ -z "$repo_root" ]
+	then
+		echo "Error: Not inside a git repository." >&2
+		exit 1
+	fi
+
+	hook_path="$repo_root/.git/hooks/prepare-commit-msg"
+	script_dir="$(cd "$(dirname "$0")" && pwd)"
+	local_hook="$script_dir/prepare-commit-msg"
+
+	if [ -f "$hook_path" ]
+	then
+		# Check for Co-authored-by in hook
+		if ! grep -q "Co-authored-by" "$hook_path"
+		then
+			echo "Error: Existing prepare-commit-msg hook does not support Co-authored-by." >&2
+			exit 1
+		fi
+		# Proceed as normal
+	else
+		# Install hook
+		if [ ! -f "$local_hook" ]
+		then
+			echo "Error: prepare-commit-msg file not found in $script_dir." >&2
+			exit 1
+		fi
+		cp "$local_hook" "$hook_path"
+		chmod +x "$hook_path"
+		echo "Installed prepare-commit-msg hook to $hook_path."
+	fi
+
 	unset_active
 	for chum in "$@"
 	do

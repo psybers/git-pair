@@ -13,13 +13,10 @@ messages.
 ## Installation
 
 - Put the `git-pair` script somewhere in your `$PATH`.
-- Put the `prepare-commit-msg` script in `.git/hooks/` inside each of your
-  repos.
+- Put the `prepare-commit-msg` script in the same place as `git-pair`.
 
-That last step is a bit tedious. I suggest you create a shell alias like so:
-```
-alias git-pair-init="cp /somewhere/prepare-commit-msg .git/hooks"
-```
+In each Git repo, the first time you run `git pair set`, it will install the
+`prepare-commit-msg` hook into that repo's `.git/hooks` directory.
 
 ## Usage
 
